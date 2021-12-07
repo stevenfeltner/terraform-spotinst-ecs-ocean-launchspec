@@ -22,30 +22,15 @@ module "ecs-ocean-launchspec" {
 }
 ```
 
-## Resources
-This module creates and manages the following resources:
-- spotinst_ocean_ecs_launchspec
-
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-## Requirements
-
-| Name | Version |
-|------|---------|
-| terraform | >=0.13.0 |
-| spotinst | >= 1.45.0 |
-
 ## Providers
 
 | Name | Version |
 |------|---------|
 | spotinst | >= 1.45.0 |
 
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| lauchspec\_id | The ID of the Ocean launchspec (VNG) |
+## Modules
+* `ecs-ocean` - Creates Ocean Cluster [Doc](https://registry.terraform.io/modules/stevenfeltner/ecs-ocean/spotinst/latest)
+* `ecs-ocean-launchspec` - (Optional) Add custom virtual node groups [Doc](https://registry.terraform.io/modules/stevenfeltner/ecs-ocean-launchspec/spotinst/latest)
 
 ## Documentation
 

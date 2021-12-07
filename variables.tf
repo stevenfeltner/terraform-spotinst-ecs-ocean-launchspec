@@ -1,12 +1,3 @@
-## Spot credentials
-variable "spot_account" {
-  type = string
-}
-variable "spot_token" {
-  type      = string
-  sensitive = true
-}
-
 ## Launchspec Variables ##
 variable "name" {
   type        = string

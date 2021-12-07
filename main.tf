@@ -7,12 +7,6 @@ terraform {
   }
 }
 
-# Configure the Spotinst provider
-provider "spotinst" {
-  token                                = var.spot_token
-  account                              = var.spot_account
-}
-
 
 resource "spotinst_ocean_ecs_launch_spec" "launchspec" {
   name                        = var.name
@@ -69,6 +63,4 @@ resource "spotinst_ocean_ecs_launch_spec" "launchspec" {
     memory_per_unit             = var.memory_per_unit
     num_of_units                = var.num_of_units
   }
-
-
 }
