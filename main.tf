@@ -1,27 +1,25 @@
-terraform {
-  required_version = ">= 0.13.0"
-  required_providers {
-    spotinst = {
-      source = "spotinst/spotinst"
-    }
-  }
-}
-
-
-resource "spotinst_ocean_ecs_launch_spec" "launchspec" {
-  name                        = var.name
+resource "spotinst_ocean_ecs_launch_spec" "ocean_ecs_launchspec" {
   ocean_id                    = var.ocean_id
-
+  name                        = var.name
   user_data                   = var.user_data
   image_id                    = var.image_id
   iam_instance_profile        = var.iam_instance_profile
   security_group_ids          = var.security_group_ids
 
+  # Default Provider Tags
   dynamic tags {
-    for_each = var.tags == null ? [] : var.tags
+    for_each = data.aws_default_tags.default_tags.tags
     content {
-      key = tags.value["key"]
-      value = tags.value["value"]
+      key = tags.key
+      value = tags.value
+    }
+  }
+  # Additional Tags
+  dynamic tags {
+    for_each = var.tags == null ? {} : var.tags
+    content {
+      key = tags.key
+      value = tags.value
     }
   }
 
@@ -29,32 +27,11 @@ resource "spotinst_ocean_ecs_launch_spec" "launchspec" {
   restrict_scale_down           = var.restrict_scale_down
   subnet_ids                    = var.subnet_ids
 
-  ## Block Device Mappings ##
-  block_device_mappings {
-    device_name                 = var.device_name
-    ebs {
-      delete_on_termination     = var.delete_on_termination
-      encrypted                 = var.encrypted
-      iops                      = var.iops
-      kms_key_id                = var.kms_key_id
-      snapshot_id               = var.snapshot_id
-      volume_type               = var.volume_type
-      volume_size               = var.volume_size
-      throughput                = var.throughput
-      dynamic_volume_size {
-        base_size               = var.base_size
-        resource                = var.resource
-        size_per_resource_unit  = var.size_per_resource_unit
-      }
-      no_device                 = var.no_device
-    }
-  }
-
   dynamic attributes {
-    for_each = var.attributes == null ? [] : var.attributes
+    for_each = var.attributes == null ? {} : var.attributes
     content {
-      key = attributes.value["key"]
-      value = attributes.value["value"]
+      key = attributes.key
+      value = attributes.value
     }
   }
 
@@ -63,4 +40,47 @@ resource "spotinst_ocean_ecs_launch_spec" "launchspec" {
     memory_per_unit             = var.memory_per_unit
     num_of_units                = var.num_of_units
   }
+
+
+  dynamic "scheduling_task" {
+    for_each = var.scheduling_task != null ? [var.scheduling_task] : []
+    content {
+      is_enabled              = scheduling_task.value.is_enabled
+      cron_expression         = scheduling_task.value.cron_expression
+      task_type               = scheduling_task.value.task_type
+      task_headroom {
+        num_of_units          = scheduling_task.value.num_of_units
+        cpu_per_unit          = scheduling_task.value.cpu_per_unit
+        memory_per_unit       = scheduling_task.value.memory_per_unit
+      }
+    }
+  }
+
+  ## Block Device Mappings ##
+  dynamic "block_device_mappings" {
+    for_each = var.block_device_mappings != null ? [var.block_device_mappings] : []
+    content {
+      device_name = block_device_mappings.value.device_name
+      no_device                   = block_device_mappings.value.no_device
+      ebs {
+        delete_on_termination       = block_device_mappings.value.delete_on_termination
+        encrypted                   = block_device_mappings.value.encrypted
+        iops                        = block_device_mappings.value.iops
+        kms_key_id                  = block_device_mappings.value.kms_key_id
+        snapshot_id                 = block_device_mappings.value.snapshot_id
+        volume_type                 = block_device_mappings.value.volume_type
+        volume_size                 = block_device_mappings.value.volume_size
+        throughput                  = block_device_mappings.value.throughput
+        dynamic_volume_size {
+          base_size               = block_device_mappings.value.base_size
+          resource                = block_device_mappings.value.resource
+          size_per_resource_unit  = block_device_mappings.value.size_per_resource_unit
+        }
+      }
+    }
+  }
+
+
+
+
 }

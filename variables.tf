@@ -28,12 +28,9 @@ variable "security_group_ids" {
   description = "One or more security group ids"
 }
 variable "tags" {
-  type = list(object({
-    key = string
-    value = string
-  }))
+  type        = map(string)
   default     = null
-  description = "Tags to be added to resources"
+  description = "Optionally adds tags to instances launched in an Ocean cluster."
 }
 variable "instance_types" {
   type        = list(string)
@@ -41,7 +38,7 @@ variable "instance_types" {
   description = "A list of instance types allowed to be provisioned for pods pending under the specified launch specification. The list overrides the list defined for the Ocean cluster."
 }
 variable "restrict_scale_down" {
-  type      = bool
+  type        = bool
   default     = null
   description = "When set to “True”, VNG nodes will be treated as if all pods running have the restrict-scale-down label. Therefore, Ocean will not scale nodes down unless empty."
 }
@@ -52,86 +49,33 @@ variable "subnet_ids" {
 }
 ###################
 
-
 ## Block Device Mappings ##
-variable "device_name" {
-  type        = string
-  default     = ""
-  description = "Set device name. (Example: /dev/xvda1)."
-}
-variable "delete_on_termination" {
-  type        = string
-  default     = null
-  description = "Flag to delete the EBS on instance termination."
-}
-variable "encrypted" {
-  type        = bool
-  default     = null
-  description = "Enables EBS encryption on the volume."
-}
-variable "iops" {
-  type        = string
-  default     = null
-  description = "(Required for requests to create io1 volumes; it is not used in requests to create gp2, st1, sc1, or standard volumes) Int. The number of I/O operations per second (IOPS) that the volume supports."
-}
-variable "kms_key_id" {
-  type        = string
-  default     = null
-  description = "Identifier (key ID, key alias, ID ARN, or alias ARN) for a customer managed CMK under which the EBS volume is encrypted."
-}
-variable "snapshot_id" {
-  type        = string
-  default     = null
-  description = "The Snapshot ID to mount by."
-}
-variable "volume_type" {
-  type        = string
-  default     = null
-  description = "The type of the volume. (Example: gp2)."
-}
-variable "volume_size" {
-  type        = number
-  default     = null
-  description = "The size, in GB of the volume."
-}
-variable "throughput" {
-  type        = number
-  default     = null
-  description = "The amount of data transferred to or from a storage device per second, you can use this param just in a case that volume_type = gp3."
-}
-###################
-
-## Dynamic Volume Size ##
-variable "base_size" {
-  type        = number
-  default     = 30
-  description = "Int. Initial size for volume. (Example: 50)"
-}
-variable "resource" {
-  type        = string
-  default     = "CPU"
-  description = "Resource type to increase volume size dynamically by. (Valid values: CPU)"
-}
-variable "size_per_resource_unit" {
-  type        = number
-  default     = 20
-  description = "Int. Additional size (in GB) per resource unit. (Example: baseSize=50, sizePerResourceUnit=20, and instance with 2 CPU is launched; its total disk size will be: 90GB)"
-}
-variable "no_device" {
-  type        = string
-  default     = null
-  description = "String. Suppresses the specified device included in the block device mapping of the AMI."
+variable "block_device_mappings" {
+  type 								= object({
+    device_name						= string
+    delete_on_termination 			= bool
+    encrypted 						= bool
+    iops 							= number
+    kms_key_id 						= string
+    snapshot_id 					= string
+    volume_type 					= string
+    volume_size						= number
+    throughput						= number
+    base_size						= number
+    resource 						= string
+    size_per_resource_unit			= number
+    no_device 						= string
+  })
+  default 							= null
+  description 						= "Block Device Mapping Object"
 }
 ##################
 
 ## Attributes ##
 variable "attributes" {
-  type = list(object({
-    key = string
-    value = string
-  }))
+  type        = map(string)
   default     = null
-  description = "attributes to be use"
+  description = "Optionally adds labels to instances launched in an Ocean cluster."
 }
 
 ## Headroom ##
@@ -151,3 +95,17 @@ variable "num_of_units" {
   description = "The number of units to retain as headroom, where each unit has the defined headroom CPU, memory and GPU."
 }
 ##################
+
+## Scheduled Task ##
+variable "scheduling_task" {
+  type 				    = object({
+    is_enabled 		    = bool
+    cron_expression 	= list(string)
+    task_type 	        = string
+    num_of_units 		= number
+    cpu_per_unit 		= number
+    memory_per_unit     = number
+  })
+  default 				= null
+  description 			= "Scheduled Task Block"
+}

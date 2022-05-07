@@ -1,6 +1,4 @@
-# ECS on Spot.io
-
-# Spot Ocean ECS Terraform Module
+# Spot Ocean ECS Launchspec Terraform Module
 
 ## Prerequisites
 
@@ -9,16 +7,35 @@
 
 ## Usage
 ```hcl
-module "ecs-ocean-launchspec" {
-  source = "../"
+### Create Ocean ECS Cluster ###
+module "ocean_ecs" {
+  source = "stevenfeltner/ecs-ocean/spotinst"
 
-  spot_token                      = "12345678901234567890"
-  spot_account                    = "act-123456789"
+  cluster_name                    = "ECS-Workshop"
+  desired_capacity                = 0
+  region                          = "us-west-2"
+  subnet_ids                      = ["subnet-123456789, subnet-123456789, subnet-123456789, subnet-123456789"]
+  security_group_ids              = ["sg-123456789"]
+  iam_instance_profile            = "arn:aws:iam::123456789:instance-profile/ecsInstanceRole"
 
-  ocean_id = module.ecs-ocean.ocean_id
-  name = "Example Launchspec"
+  tags                            = {CreatedBy = "terraform"}
+}
+### Create Ocean ECS Launchspec ###
+module "ocean_ecs_launchspec" {
+  source = "stevenfeltner/ecs-ocean-launchspec/spotinst"
 
-  tags = [{key = "CreatedBy", value = "terraform"},{key = "Env", value = "Dev"}]
+  name                            = "VNG1"
+  ocean_id                        = module.ocean_ecs.ocean_id
+  attributes                      = {Test = "example"}
+
+  tags                            = {CreatedBy = "terraform"}
+}
+### Outputs ###
+output "ocean_id" {
+  value = module.ocean_ecs.ocean_id
+}
+output "ocean_launchspec_id" {
+  value = module.ocean_ecs_launchspec.launchspec_id
 }
 ```
 
@@ -30,7 +47,7 @@ module "ecs-ocean-launchspec" {
 
 ## Modules
 * `ecs-ocean` - Creates Ocean Cluster [Doc](https://registry.terraform.io/modules/stevenfeltner/ecs-ocean/spotinst/latest)
-* `ecs-ocean-launchspec` - (Optional) Add custom virtual node groups [Doc](https://registry.terraform.io/modules/stevenfeltner/ecs-ocean-launchspec/spotinst/latest)
+* `ecs-ocean-launchspec` - (Optional) Add custom virtual node groups
 
 ## Documentation
 
