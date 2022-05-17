@@ -73,6 +73,8 @@ variable "dynamic_volume_size" {
     resource 						= string
     size_per_resource_unit			= number
   })
+  default 							= null
+  description 						= "dynamic_volume_size Object"
 }
 ##################
 
