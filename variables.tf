@@ -61,13 +61,18 @@ variable "block_device_mappings" {
     volume_type 					= string
     volume_size						= number
     throughput						= number
-    base_size						= number
-    resource 						= string
-    size_per_resource_unit			= number
     no_device 						= string
   })
   default 							= null
   description 						= "Block Device Mapping Object"
+}
+
+variable "dynamic_volume_size" {
+  type 					  = object({
+    base_size						= number
+    resource 						= string
+    size_per_resource_unit			= number
+  })
 }
 ##################
 
